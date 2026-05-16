@@ -6,7 +6,7 @@ import os
 import io
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv()  # works locally
 
 app = FastAPI()
 
@@ -17,7 +17,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+def get_client():
+    return Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 class Message(BaseModel):
     message: str
@@ -49,7 +50,7 @@ def chat(msg: Message):
     if msg.pdf_context:
         system_prompt += f"\n\nThe student has uploaded notes. Use this context to answer:\n{msg.pdf_context}"
 
-    response = client.chat.completions.create(
+    response = get_client().chat.completions.create(
         model="llama-3.3-70b-versatile",
         messages=[
             {"role": "system", "content": system_prompt},
